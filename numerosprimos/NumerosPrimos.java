@@ -1,9 +1,9 @@
-package zzz_numerosprimos;
+package numerosprimos;
 
 /**
  * @author fsancheztemprano
  */
-public class ZZZ_NumerosPrimos {
+public class NumerosPrimos {
 
     public static int startNum = 1;
     public static int activeNum = startNum;
