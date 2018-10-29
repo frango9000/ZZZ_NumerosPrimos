@@ -1,96 +1,216 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package zzz_numerosprimos;
 
 /**
- *
  * @author fsancheztemprano
  */
 public class ZZZ_NumerosPrimos {
 
-    /**
-     * @param args the command line arguments
-     */
+    public static int startNum = 1;
+    public static int activeNum = startNum;
+    public static int finalNum = 99929;
+    public static int numOfPrimes = 0;
+    public static int numOfNotPrimes = 0;
+    public static int numOfSkips;
+    public static int numOfSkips3 = 0;
+    public static int numOfSkips6 = 0;
+    public static int numOfSkips30 = 0;
+    public static int numOfSkips210 = 0;
+    public static int lastPrime = 0;
+    public static int bigestLeap = 0;
+    public static int bigestLeaper = 0;
+    public static int calcsDone = 0;
+    public static boolean debug = false;
+    public static boolean notPrimes = false;
+    public static boolean justList = false;
+
     public static void main(String[] args) {
 
-        int startNum = 1;
-        int activeNum = startNum;
-        int finalNum = 1000000;
-        int numOfPrimes = 0;
-        int numOfNotPrimes = 0;
-        int numOfSkips = 0;
-        int lastPrime = 0;
-        int bigestLeap = 0;
-        int bigestLeaper = 0;
-        int calcsDone = 0;
+        prime:
+        for (int i = activeNum; i <= finalNum; i += 2) {
+            int count;
 
-        if (activeNum % 2 == 0) {
-            activeNum++;
-        }
-
-        for (int i = activeNum; i <= finalNum + 2; i += 2) {
-            int count = 0;
-            //if( (activeNum<=3) || ( activeNum % 6 == 1 ) || (  activeNum % 6 == 5 ) ){
-            if ((activeNum <= 3)
-                    || (((activeNum > 3) || (activeNum < 31))
-                    && (activeNum % 6 != 1)
-                    && (activeNum % 6 != 5))
-                    || ((activeNum >= 31) && ((activeNum % 30 != 1)
-                    && (activeNum % 30 != 7)
-                    && (activeNum % 30 != 11)
-                    && (activeNum % 30 != 13)
-                    && (activeNum % 30 != 17)
-                    && (activeNum % 30 != 23)
-                    && (activeNum % 30 != 29)))) {
-
-                numOfSkips++;
-            } else {
-                int actualNum = activeNum;
-                for (int f = actualNum + 1; f > 0; f -= 2) {
-                    if (activeNum % actualNum == 0) {
-                        count++;
-                    }
-                    calcsDone++;
-                    if (count > 2) {
-                        break;
-                    }
-                    if (actualNum > 2) {
-                        actualNum -= 2;
-                    } else {
-                        actualNum--;
-                    }
-                }
-            }
-
-            if (count > 2 || count == 0) {
-                numOfNotPrimes++;
-            } else {
-                if ((activeNum - lastPrime) > bigestLeap) {
-                    bigestLeap = activeNum - lastPrime;
-                    bigestLeaper = activeNum;
-                }
-                System.out.println("Number: " + activeNum + " IS prime! " + (activeNum % 30));
-                numOfPrimes++;
-                lastPrime = activeNum;
-            }
-
-            //System.out.println(activeNum);
-            if (activeNum <= 2) {
+            if ((activeNum <= 3) || isEven(activeNum)) {
                 activeNum++;
+                i--;
             } else {
-                activeNum += 2;
+                activeNum++;
+                activeNum++;
+            }
+            if (activeNum > finalNum) {
+                break;
+            }
+            if (activeNum >= 3 && isDivisible3(activeNum)) { //useless code redundant on 6
+                numOfSkips3++;
+                if (debug) {
+                    System.out.println(activeNum + " Skip3++");
+                }
+                continue prime;
+            }
+            if (activeNum >= 6 && isDivisible6(activeNum)) {
+                numOfSkips6++;
+                if (debug) {
+                    System.out.println(activeNum + " Skip6++");
+                }
+                continue prime;
+            }
+            if (activeNum >= 31 && isDivisible30(activeNum)) {
+                numOfSkips30++;
+                if (debug) {
+                    System.out.println(activeNum + " Skip30++");
+                }
+                continue prime;
+            }
+            if (activeNum >= 210 && isDivisible210(activeNum)) {
+                numOfSkips210++;
+                if (debug) {
+                    System.out.println(activeNum + " Skip210++");
+                }
+                continue prime;
+
+            }
+
+            count = countDivisors();
+            if (count > 2 || count == 0) {
+                isNotPrime();
+            } else {
+                isPrime();
             }
         }
+
+        numOfSkips = numOfSkips3 + numOfSkips6 + numOfSkips30 + numOfSkips210;
         System.out.println("From Num: " + startNum + " to Num: " + (activeNum - 1));
         System.out.println(numOfPrimes + " Prime Numbers Found!");
         System.out.println(numOfNotPrimes + ((finalNum - 2) / 2) + " Composite Numbers Found!");
-        System.out.println(numOfSkips + " Nums Skipped thanks to 6N+30N Tech");
+        System.out.println(numOfSkips + " Nums Skipped thanks to 6N+30N+210N Tech");
         System.out.println("Biggest Leap of primes is: " + bigestLeap + ", at Prime: " + bigestLeaper);
         System.out.println(calcsDone + " Loops");
 
     }
-    
+
+    public static int countDivisors() {
+        int count = 0;
+        int actualNum = activeNum;
+        for (int f = actualNum + 1; f > 0; f -= 2) {
+            if (activeNum % actualNum == 0) {
+                count++;
+            }
+            calcsDone++;
+            if (count > 2) {
+                break;
+            }
+            if (actualNum > 2) {//Optimizable
+                actualNum -= 2;
+            } else {
+                actualNum--;
+            }
+        }
+        return count;
+    }
+
+    public static void isPrime() {
+        numOfPrimes++;
+        leapPrime();
+        lastPrime = activeNum;
+        if (justList) {
+            System.out.println(activeNum);
+        } else {
+            System.out.println("Number: " + activeNum + " IS prime! " + "" + (activeNum % 6) + " " + (activeNum % 30) + " " + (activeNum % 210));
+        }
+    }
+
+    public static void isNotPrime() {
+        numOfNotPrimes++;
+        if (notPrimes) {
+            System.out.println("Number: " + activeNum + " NOT prime! " + "" + (activeNum % 6) + " " + (activeNum % 30) + " " + (activeNum % 210));
+        }
+    }
+
+    public static void leapPrime() {
+        if ((activeNum - lastPrime) > bigestLeap) {
+            bigestLeap = activeNum - lastPrime;
+            bigestLeaper = activeNum;
+        }
+    }
+
+    public static boolean isEven(int n) {
+        if (n % 2 == 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean isDivisible3(int n) {
+        if (n % 3 != 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public static boolean isDivisible6(int n) {
+        if (n % 6 != 1 && n % 6 != 5) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean isDivisible30(int n) {
+        if (n % 30 != 7 && n % 30 != 11 && n % 30 != 13 && n % 30 != 23 && n % 30 != 27 && n % 30 != 29) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean isDivisible210(int n) {
+        if (n % 210 != 31
+                && n % 210 != 37
+                && n % 210 != 41
+                && n % 210 != 43
+                && n % 210 != 47
+                && n % 210 != 53
+                && n % 210 != 59
+                && n % 210 != 61
+                && n % 210 != 67
+                && n % 210 != 71
+                && n % 210 != 73
+                && n % 210 != 79
+                && n % 210 != 83
+                && n % 210 != 89
+                && n % 210 != 97
+                && n % 210 != 101
+                && n % 210 != 103
+                && n % 210 != 107
+                && n % 210 != 109
+                && n % 210 != 113
+                && n % 210 != 127
+                && n % 210 != 131
+                && n % 210 != 137
+                && n % 210 != 139
+                && n % 210 != 149
+                && n % 210 != 151
+                && n % 210 != 157
+                && n % 210 != 163
+                && n % 210 != 167
+                && n % 210 != 173
+                && n % 210 != 179
+                && n % 210 != 181
+                && n % 210 != 191
+                && n % 210 != 193
+                && n % 210 != 197
+                && n % 210 != 199) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    //TODO
+    public static boolean isDivisible2310(int n) {
+        return true;
+    }
+
+    //TODO fill arrays on the go
 }
