@@ -7,49 +7,40 @@ public class NumerosPrimos {
 
     public static int startNum = 1;
     public static int activeNum = startNum;
-    public static int finalNum = 99929;
+    public static int finalNum = 99999;
     public static int numOfPrimes = 0;
-    public static int numOfNotPrimes = 0;
     public static int numOfSkips;
     public static int numOfSkips3 = 0;
+    public static int numOfSkips5 = 0;
     public static int numOfSkips6 = 0;
     public static int numOfSkips30 = 0;
     public static int numOfSkips210 = 0;
     public static int lastPrime = 0;
     public static int bigestLeap = 0;
     public static int bigestLeaper = 0;
-    public static int calcsDone = 0;
-    public static boolean debug = false;
+    public static long calcsDone = 0L;
+    public static boolean debug = true;
     public static boolean notPrimes = false;
     public static boolean justList = false;
 
     public static void main(String[] args) {
-
+        if (isEven(activeNum)) {
+            activeNum++;
+        }
         prime:
-        for (int i = activeNum; i <= finalNum; i += 2) {
+        for (; activeNum <= finalNum; activeNum += 2) {
             int count;
-
-            if ((activeNum <= 3) || isEven(activeNum)) {
-                activeNum++;
-                i--;
-            } else {
-                activeNum++;
-                activeNum++;
-            }
-            if (activeNum > finalNum) {
-                break;
-            }
-            if (activeNum >= 3 && isDivisible3(activeNum)) { //useless code redundant on 6
+            if (activeNum > 3 && isDivisible3(activeNum)) {
                 numOfSkips3++;
                 if (debug) {
                     System.out.println(activeNum + " Skip3++");
                 }
                 continue prime;
             }
-            if (activeNum >= 6 && isDivisible6(activeNum)) {
-                numOfSkips6++;
+            if (activeNum > 5 && isDivisible5(activeNum)) {
+                numOfSkips5++;
                 if (debug) {
-                    System.out.println(activeNum + " Skip6++");
+                    System.out.println(activeNum + " Skip5++");
                 }
                 continue prime;
             }
@@ -68,40 +59,24 @@ public class NumerosPrimos {
                 continue prime;
 
             }
-
-            count = countDivisors();
-            if (count > 2 || count == 0) {
+            if (countDivisors() > 0) {
                 isNotPrime();
             } else {
                 isPrime();
             }
         }
-
-        numOfSkips = numOfSkips3 + numOfSkips6 + numOfSkips30 + numOfSkips210;
-        System.out.println("From Num: " + startNum + " to Num: " + (activeNum - 1));
-        System.out.println(numOfPrimes + " Prime Numbers Found!");
-        System.out.println(numOfNotPrimes + ((finalNum - 2) / 2) + " Composite Numbers Found!");
-        System.out.println(numOfSkips + " Nums Skipped thanks to 6N+30N+210N Tech");
-        System.out.println("Biggest Leap of primes is: " + bigestLeap + ", at Prime: " + bigestLeaper);
-        System.out.println(calcsDone + " Loops");
-
+        showStats();
     }
 
     public static int countDivisors() {
         int count = 0;
-        int actualNum = activeNum;
-        for (int f = actualNum + 1; f > 0; f -= 2) {
-            if (activeNum % actualNum == 0) {
+        for (int f = 3; f <= activeNum / 3; f += 2) {
+            if (activeNum % f == 0) {
                 count++;
             }
             calcsDone++;
-            if (count > 2) {
+            if (count > 0) {
                 break;
-            }
-            if (actualNum > 2) {//Optimizable
-                actualNum -= 2;
-            } else {
-                actualNum--;
             }
         }
         return count;
@@ -119,7 +94,6 @@ public class NumerosPrimos {
     }
 
     public static void isNotPrime() {
-        numOfNotPrimes++;
         if (notPrimes) {
             System.out.println("Number: " + activeNum + " NOT prime! " + "" + (activeNum % 6) + " " + (activeNum % 30) + " " + (activeNum % 210));
         }
@@ -148,6 +122,14 @@ public class NumerosPrimos {
         }
     }
 
+    public static boolean isDivisible5(int n) {
+        if (n % 5 != 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     public static boolean isDivisible6(int n) {
         if (n % 6 != 1 && n % 6 != 5) {
             return true;
@@ -157,7 +139,7 @@ public class NumerosPrimos {
     }
 
     public static boolean isDivisible30(int n) {
-        if (n % 30 != 7 && n % 30 != 11 && n % 30 != 13 && n % 30 != 23 && n % 30 != 27 && n % 30 != 29) {
+        if (n % 30 != 5 && n % 30 != 7 && n % 30 != 11 && n % 30 != 13 && n % 30 != 23 && n % 30 != 27 && n % 30 != 29) {
             return true;
         } else {
             return false;
@@ -213,4 +195,26 @@ public class NumerosPrimos {
     }
 
     //TODO fill arrays on the go
+    public static boolean isDivisibleByPrime(int n) {
+        return true;
+    }
+
+    public static void showStats() {
+        numOfSkips = numOfSkips3 + numOfSkips5 + numOfSkips30 + numOfSkips210;
+        //Basic Msgs
+        System.out.println("From Number: " + startNum + " to Number: " + finalNum);
+        System.out.println("Prime Numbers: " + numOfPrimes);
+        System.out.println("Composite Numbers :" + (finalNum - startNum - 1 - numOfPrimes));
+        System.out.println("Biggest Leap of primes is: " + bigestLeap + ", at Primes: " + (bigestLeaper - bigestLeap) + ", " + bigestLeaper);
+        //Debug Msgs
+        System.out.println("Loops: " + calcsDone);
+        System.out.println("Nums Skipped: " + numOfSkips);
+
+        System.out.println("Nums Skipped 2.n : " + ((finalNum - startNum) / 2));
+        System.out.println("Nums Skipped 3.n : " + numOfSkips3);
+        System.out.println("Nums Skipped 5.n : " + numOfSkips5);
+        System.out.println("Nums Skipped 2.3.5.n : " + numOfSkips30);
+        System.out.println("Nums Skipped 2.3.5.7.n : " + numOfSkips210);
+
+    }
 }
