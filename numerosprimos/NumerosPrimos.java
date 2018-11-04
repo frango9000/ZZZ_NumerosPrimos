@@ -16,17 +16,18 @@ public class NumerosPrimos {
     public static boolean justList = true;
 
     public static void main(String[] args) {
-        if (Primes.isEven(activeNum)) {
-            activeNum++;
-        }
-        for (; activeNum <= finalNum; activeNum += 2) {
-            if (!Primes.checkPrime(activeNum)) {
-                isNotPrime();
-            } else {
-                isPrime();
-            }
-        }
-        showStats();
+//        if (Primes.isEven(activeNum)) {
+//            activeNum++;
+//        }
+//        for (; activeNum <= finalNum; activeNum += 2) {
+//            if (!Primes.checkPrime(activeNum)) {
+//                isNotPrime();
+//            } else {
+//                isPrime();
+//            }
+//        }
+//        showStats();
+Primes.listOfPrimesUntil(500);
     }
 
 
