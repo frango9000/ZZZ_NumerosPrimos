@@ -5,6 +5,9 @@
  */
 package numerosprimos;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author NarF
@@ -130,5 +133,16 @@ public class Primes {
     }
     public static int numOfSkips(){
         return numOfSkips2 + numOfSkips3 + numOfSkips5 + numOfSkips6 + numOfSkips7 + numOfSkips11 + numOfSkips30 + numOfSkips210;
+    }
+    
+    public static List listOfPrimesUntil(int n){
+        List primes = new ArrayList();
+        primes.add(2);
+        for (int i=3;i<=n;i+=2){
+            if(checkPrime(i)){
+                primes.add(i);                
+            }
+        }
+        return primes;
     }
 }
